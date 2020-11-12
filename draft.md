@@ -101,15 +101,19 @@ An idempotency fingerprint MAY be used in conjunction with with an idempotency k
 ## Idempotency Enforcement Scenarios
 
 First time Request (Idempotency Key and Idempotency FIngerprint scenarios has not been seen)
+
     The server SHOULD process the request normally and the server responds with an appropriate response and status code.
 
 Duplicate Request (Idempotency Key and Idempotency Fingerprint scenarios has been seen)
+
     Replay
         The request was replayed after the original request completed. The server MUST respond with the result of the previously completed operation, success or an    error
+        
     Concurrent Request
         The request was replayed before the original request completed. Thhe server MUST respond with a reesource conflict error. See #Error scenarions for details.
        
 ## Responsibilities
+
     Client
       For the idempotent resource operations, the client MUST present a unique idempotency key as part of the request.
       
