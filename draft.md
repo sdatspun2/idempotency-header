@@ -107,6 +107,18 @@ If there is an attempt to reuse an idempotency key with a different request payl
     Link: <https://developer.example.com/idempotency>;
     rel="describedby"; type="text/html"
 
+If there is an attempt to reuse an idempotency key that is expired, the resource MUST reply with an `HTTP` `422` status code with body containing a link pointing to the relevant documentation. Using the `HTTP` header `Link`, client could be informed about the error as following.
+
+    HTTP/1.1 422 Unprocessable Entity
+    Link: <https://developer.example.com/idempotency>;
+    rel="describedby"; type="text/html"
+    
+If the servers receives a duplicate request, while the original request is still processing, the resource MUST reply with an `HTTP` `409` status code with body containing a link pointing to the relevant documentation. Using the `HTTP` header `Link`, client could be informed about the error as following.
+
+    HTTP/1.1 409 Conflict
+    Link: <https://developer.example.com/idempotency>;
+    rel="describedby"; type="text/html"
+
 For other errors, the resource MUST return the appropriate status code and error message.
 
 
@@ -122,7 +134,7 @@ The `Idempotency-Key` request header should be added to the permanent registry o
 
     Status: Standard
 
-    Author: Jayadeba Jena, <jjean@paypal.com>
+    Author: Jayadeba Jena, <jjena@paypal.com>
             Sanjay Dalal <sanjay.dalal@cal.berkeley.edu>
 
     Change controller: IETF
@@ -215,20 +227,9 @@ Organization: Google Standard Payments
 # Security Considerations
 
 This section is meant to inform developers, information providers,
-and users of known security concerns specific to the HTTP conditional
-request mechanisms.  More general security considerations are
-addressed in HTTP "Message Syntax and Routing" {{!RFC7230}} and
-"Semantics and Content" {{!RFC7231}}.
+and users of known security concerns specific to the idempotency keys.
 
-The validators defined by this specification are not intended to
-ensure the validity of a representation, guard against malicious
-changes, or detect man-in-the-middle attacks. At best, they enable
-more efficient ...? when
-all participants are behaving nicely. At worst, the conditions will
-fail and the client will receive a response that is no more harmful
-than an HTTP exchange without conditional requests.
-
-An entity-tag can be abused in ways that create ? risks.
+For idempotent request handling, the servers MAY make use of the value in the idempotency key to look up the idempotent request cache such as a persistent store, for duplicate requests, matching the key. If server does not validate the value of the idempotency key, prior to performing the lookup, it MAY lead to various forms of security attacks, compromising the server. To avoid these, the server SHOULD declare the expected format of the idempotency key in the API documentation and always validate the value as per the published specification for the key, before processing the request.
 
 
 
