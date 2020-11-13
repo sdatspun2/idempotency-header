@@ -110,7 +110,7 @@ Duplicate Request (Idempotency Key and Idempotency Fingerprint scenarios has bee
         The request was replayed after the original request completed. The resource server MUST respond with the result of the previously completed operation, success or an    error
         
     Concurrent Request
-        The request was replayed before the original request completed. The resoource server MUST respond with a resource conflict error. See #Error scenarions for details.
+        The request was replayed before the original request completed. The resource server MUST respond with a resource conflict error. See ## Error Scenarios for details.
        
 ## Responsibilities
 
