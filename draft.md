@@ -14,6 +14,7 @@ author:
     name: Jayadeba Jena
     email: jjena@paypal.com
     uri: https://github.com/jayadeba
+
   -        
     ins: S. Dalal
     name: Sanjay Dalal
@@ -228,6 +229,10 @@ Organization: Django
 - Description: Django uses custom HTTP header named `HTTP_IDEMPOTENCY_KEY`
 - Reference:  https://pypi.org/project/django-idempotency-key
 
+Organization: Twilio
+
+- Description: Twilio uses custom HTTP header named `I-Twilio-Idempotency-Token` in webhooks
+- Reference: https://www.twilio.com/docs/usage/webhooks/webhooks-connection-overrides
 
 Organization: PayPal
 
@@ -236,17 +241,13 @@ Organization: PayPal
 
 Organization: RazorPay
 
-- Description: PayPal uses custom HTTP header named `X-Payout-Idempotency`
+- Description: RazorPay uses custom HTTP header named `X-Payout-Idempotency`
 - Reference: https://razorpay.com/docs/razorpayx/api/idempotency/
 
-Organization: Twilio
-
-- Description: Twilio uses custom HTTP header named `I-Twilio-Idempotency-Token` in webhooks
-- Reference: https://www.twilio.com/docs/usage/webhooks/webhooks-connection-overrides
 
 Organization: OpenBanking
 
-- Description: OpenBanking using custom HTTP header called `x-idempotency-key`
+- Description: OpenBanking uses custom HTTP header called `x-idempotency-key`
 - Reference: https://openbankinguk.github.io/read-write-api-site3/v3.1.6/profiles/read-write-data-api-profile.html#request-headers
 
 Organization: Square
@@ -258,6 +259,18 @@ Organization: Google Standard Payments
 
 - Description: Google Standard Payments API uses a property named `requestId` in request body in order to provider idempotency in various use cases.
 - Reference: https://developers.google.com/standard-payments/payment-processor-service-api/rest/v1/TopLevel/capture
+
+Organization: BBVA
+
+- Description: BBVA Open Platform uses custom HTTP header called `X-Unique-Transaction-ID`
+- Reference: https://bbvaopenplatform.com/apiReference/APIbasics/content/x-unique-transaction-id
+
+
+Organization: WebEngage
+
+- Description: WebEngage uses custom HTTP header called `x-request-id` to identify webhook POST requests uniquely to achieve events idempotency.
+- Reference: https://docs.webengage.com/docs/webhooks
+
 
 # Security Considerations
 
