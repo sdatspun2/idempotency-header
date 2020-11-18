@@ -172,7 +172,8 @@ The `Idempotency-Key` request header should be added to the permanent registry o
 
     Status: Standard
 
-    Author: Jayadeba Jena
+    Authors: 
+            Jayadeba Jena
             PayPal Inc.
             Email: jjena@paypal.com
             
