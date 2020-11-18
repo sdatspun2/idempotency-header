@@ -12,8 +12,9 @@ author:
   -
     ins: J. Jena
     name: Jayadeba Jena
+    PayPal Inc.
     email: jjena@paypal.com
-    uri: https://github.com/jayadeba
+   
 
   -        
     ins: S. Dalal
@@ -171,8 +172,13 @@ The `Idempotency-Key` request header should be added to the permanent registry o
 
     Status: Standard
 
-    Author: Jayadeba Jena, <jjena@paypal.com>
-            Sanjay Dalal <sanjay.dalal@cal.berkeley.edu>
+    Author: Jayadeba Jena
+            PayPal Inc.
+            Email: jjena@paypal.com
+            
+            
+            Sanjay Dalal 
+            Email: sanjay.dalal@cal.berkeley.edu
 
     Change controller: IETF
 
