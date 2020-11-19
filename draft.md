@@ -12,13 +12,15 @@ author:
   -
     ins: J. Jena
     name: Jayadeba Jena
-    PayPal Inc.
+
     email: jjena@paypal.com
-   
+
+
 
   -        
     ins: S. Dalal
     name: Sanjay Dalal
+
     email: sanjay.dalal@cal.berkeley.edu
     uri: https://github.com/sdatspun2
 
@@ -172,13 +174,12 @@ The `Idempotency-Key` request header should be added to the permanent registry o
 
     Status: Standard
 
-    Authors: 
+    Authors:
             Jayadeba Jena
-            PayPal Inc.
             Email: jjena@paypal.com
-            
-            
-            Sanjay Dalal 
+
+
+            Sanjay Dalal
             Email: sanjay.dalal@cal.berkeley.edu
 
     Change controller: IETF
