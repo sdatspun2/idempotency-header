@@ -12,19 +12,17 @@ author:
   -
     ins: J. Jena
     name: Jayadeba Jena
-    organization: PayPal, Inc.
-    email: jjena@paypal.com
-    country: US
 
+    email: jjena@paypal.com
 
 
 
   -        
     ins: S. Dalal
     name: Sanjay Dalal
+
     email: sanjay.dalal@cal.berkeley.edu
     uri: https://github.com/sdatspun2
-    country: US
 
 
 normative:

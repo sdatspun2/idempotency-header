@@ -5,7 +5,7 @@
 Network Working Group                                            J. Jena
 Internet-Draft                                                          
 Intended status: Standards Track                                S. Dalal
-Expires: 22 May 2021                                    18 November 2020
+Expires: 21 May 2021                                    17 November 2020
 
 
                    The Idempotency HTTP Header Field
@@ -32,7 +32,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 May 2021.
+   This Internet-Draft will expire on 21 May 2021.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Jena & Dalal               Expires 22 May 2021                  [Page 1]
+Jena & Dalal               Expires 21 May 2021                  [Page 1]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -76,8 +76,8 @@ Table of Contents
      4.1.  Implementing the Concept  . . . . . . . . . . . . . . . .   8
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
    6.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .  10
-   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
-     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  11
+   7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
+     7.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
      7.2.  Informative References  . . . . . . . . . . . . . . . . .  11
    Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .  11
    Appendix B.  Appendix . . . . . . . . . . . . . . . . . . . . . .  12
@@ -105,18 +105,18 @@ Table of Contents
    calling it multiple times can result in duplication or wrong updates.
    What would happen if you sent out the POST request to the server, but
    you get a timeout?  Is the resource actually created or updated?
-   Does the timeout happen during sending of the request to the server,
+   Does the timeout happened during sending of the request to the
 
 
 
-Jena & Dalal               Expires 22 May 2021                  [Page 2]
+Jena & Dalal               Expires 21 May 2021                  [Page 2]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
-   or while receiving the response on the client?  Can we safely retry
-   again, or do we need to figure out first what has happened with the
-   resource?  If "POST" had been an idempotent method, we would not have
+   server, or while receiving the response on the client?  Can we safely
+   retry again, or do we need to figure out first what has happened with
+   the resource?  If "POST" was an idempotent method, we would not have
    to answer such questions.  We could safely resend a request until we
    actually get a response back from the server.
 
@@ -165,7 +165,7 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
 
-Jena & Dalal               Expires 22 May 2021                  [Page 3]
+Jena & Dalal               Expires 21 May 2021                  [Page 3]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -221,7 +221,7 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
 
-Jena & Dalal               Expires 22 May 2021                  [Page 4]
+Jena & Dalal               Expires 21 May 2021                  [Page 4]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -277,7 +277,7 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
 
-Jena & Dalal               Expires 22 May 2021                  [Page 5]
+Jena & Dalal               Expires 21 May 2021                  [Page 5]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -333,7 +333,7 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
 
-Jena & Dalal               Expires 22 May 2021                  [Page 6]
+Jena & Dalal               Expires 21 May 2021                  [Page 6]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -344,13 +344,8 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
    Status: Standard
 
-   Authors:
-           Jayadeba Jena
-           Email: jjena@paypal.com
-
-
-           Sanjay Dalal
-           Email: sanjay.dalal@cal.berkeley.edu
+   Author: Jayadeba Jena, <jjena@paypal.com>
+           Sanjay Dalal <sanjay.dalal@cal.berkeley.edu>
 
    Change controller: IETF
 
@@ -386,19 +381,18 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    *  Description: Stripe uses custom HTTP header named "Idempotency-
       Key"
 
-
-
-
-Jena & Dalal               Expires 22 May 2021                  [Page 7]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    *  Reference: https://stripe.com/docs/idempotency
 
    Organization: Adyen
 
    *  Description: Adyen uses custom HTTP header named "Idempotency-Key"
+
+
+
+Jena & Dalal               Expires 21 May 2021                  [Page 7]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
    *  Reference: https://docs.adyen.com/development-resources/api-
       idempotency/
@@ -442,20 +436,19 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    *  Description: Django uses custom HTTP header named
       "HTTP_IDEMPOTENCY_KEY"
 
-
-
-
-Jena & Dalal               Expires 22 May 2021                  [Page 8]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    *  Reference: https://pypi.org/project/django-idempotency-key
 
    Organization: Twilio
 
    *  Description: Twilio uses custom HTTP header named "I-Twilio-
       Idempotency-Token" in webhooks
+
+
+
+Jena & Dalal               Expires 21 May 2021                  [Page 8]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
    *  Reference: https://www.twilio.com/docs/usage/webhooks/webhooks-
       connection-overrides
@@ -499,17 +492,19 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
       "requestId" in request body in order to provider idempotency in
       various use cases.
 
-
-
-Jena & Dalal               Expires 22 May 2021                  [Page 9]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    *  Reference: https://developers.google.com/standard-payments/
       payment-processor-service-api/rest/v1/TopLevel/capture
 
    Organization: BBVA
+
+
+
+
+
+Jena & Dalal               Expires 21 May 2021                  [Page 9]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
    *  Description: BBVA Open Platform uses custom HTTP header called "X-
       Unique-Transaction-ID"
@@ -554,17 +549,18 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
    Idempotency-Key: "clkyoesmbgybucifusbbtdsbohtyuuwz"
 
-
-
-
-Jena & Dalal               Expires 22 May 2021                 [Page 10]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
 7.  References
 
 7.1.  Normative References
+
+
+
+
+
+Jena & Dalal               Expires 21 May 2021                 [Page 10]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -610,18 +606,17 @@ Appendix A.  Acknowledgments
    documentation of PayPal (https://github.com/paypal/api-
    standards/blob/master/patterns.md#idempotency) and Stripe
    (https://stripe.com/docs/idempotency) as well as Internet Draft on
-
-
-
-Jena & Dalal               Expires 22 May 2021                 [Page 11]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    POST Once Exactly (https://tools.ietf.org/html/draft-nottingham-http-
    poe-00) authored by Mark Nottingham.
 
    The authors take all responsibility for errors and omissions.
+
+
+
+Jena & Dalal               Expires 21 May 2021                 [Page 11]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
 Appendix B.  Appendix
 
@@ -643,6 +638,7 @@ Authors' Addresses
    Jayadeba Jena
 
    Email: jjena@paypal.com
+   URI:   https://github.com/jayadeba
 
 
    Sanjay Dalal
@@ -669,4 +665,8 @@ Authors' Addresses
 
 
 
-Jena & Dalal               Expires 22 May 2021                 [Page 12]
+
+
+
+
+Jena & Dalal               Expires 21 May 2021                 [Page 12]
