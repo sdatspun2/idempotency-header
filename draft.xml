@@ -39,7 +39,7 @@
       </address>
     </author>
 
-    <date year="2020" month="November" day="19"/>
+    <date year="2020" month="November" day="22"/>
 
     
     
@@ -64,11 +64,11 @@
 
 <t>Idempotence is the property of certain operations in mathematics and computer science whereby they can be applied multiple times without changing the result beyond the initial application. It does not matter if the operation is called only once, or 10s of times over. The result <spanx style="verb">SHOULD</spanx> be the same.</t>
 
-<t>Idempotency is important in building a fault-tolerant <spanx style="verb">HTTP API</spanx>. An <spanx style="verb">HTTP</spanx> request method is considered <spanx style="verb">idempotent</spanx> if the intended effect on the server of multiple identical requests with that method is the same as the effect for a single such request. <xref target="RFC7231"/> defines methods <spanx style="verb">OPTIONS</spanx>, <spanx style="verb">HEAD</spanx>, <spanx style="verb">GET</spanx>, <spanx style="verb">PUT</spanx> and <spanx style="verb">DELETE</spanx> as idempotent. However, <spanx style="verb">POST</spanx> and <spanx style="verb">PATCH</spanx> methods are <spanx style="verb">NOT</spanx> idempotent.</t>
+<t>Idempotency is important in building a fault-tolerant <spanx style="verb">HTTP API</spanx>. An <spanx style="verb">HTTP</spanx> request method is considered <spanx style="verb">idempotent</spanx> if the intended effect on the server of multiple identical requests with that method is the same as the effect for a single such request. According to <xref target="RFC7231"/>, <spanx style="verb">HTTP</spanx> methods <spanx style="verb">OPTIONS</spanx>, <spanx style="verb">HEAD</spanx>, <spanx style="verb">GET</spanx>, <spanx style="verb">PUT</spanx> and <spanx style="verb">DELETE</spanx> are idempotent while methods <spanx style="verb">POST</spanx> and <spanx style="verb">PATCH</spanx> are not.</t>
 
-<t>Suppose a client on <spanx style="verb">HTTP API</spanx> wants to create or update a resource using <spanx style="verb">POST</spanx> method. Since <spanx style="verb">POST</spanx> is <spanx style="verb">NOT</spanx> an idempotent method, calling it multiple times can result in duplication or wrong updates. What would happen if you sent out the POST request to the server, but you get a timeout? Is the resource actually created or updated? Does the timeout happen during sending of the request to the server, or while receiving the response on the client? Can we safely retry again, or do we need to figure out first what has happened with the resource? If <spanx style="verb">POST</spanx> had been an idempotent method, we would not have to answer such questions. We could safely resend a request until we actually get a response back from the server.</t>
+<t>Let’s say a client of an <spanx style="verb">HTTP API</spanx> wants to create (or update) a resource using a <spanx style="verb">POST</spanx> method. Since <spanx style="verb">POST</spanx> is <spanx style="verb">NOT</spanx> an idempotent method, calling it multiple times can result in duplication or wrong updates. Consider a scenario where the client sent a <spanx style="verb">POST</spanx> request to the server, but it got a timeout. Following questions arise. Is the resource actually created (or updated)? Did the timeout occur during sending of the request, or when receiving of the response? Can the client safely retry the request, or does it need to figure out what happened in the first place? If <spanx style="verb">POST</spanx> had been an idempotent method, such questions may not arise. Client would safely retry a request until it actually gets a valid response from the server.</t>
 
-<t>For many use cases in <spanx style="verb">HTTP API</spanx>, creation of duplicate records is a severe problem from business perspective. For example, in Fintech industry, duplicate records for requests involving any kind of payment transaction on a financial account <spanx style="verb">MUST NOT</spanx> be allowed. In other cases, processing of duplicate webhooks due to retries is not warranted.</t>
+<t>For many use cases of <spanx style="verb">HTTP API</spanx>, duplicate resource is a severe problem from business perspective. For example, duplicate records for requests involving any kind of money transfer <spanx style="verb">MUST NOT</spanx> be allowed. In other cases, processing of duplicate webhook delivery is not expected.</t>
 
 <section anchor="notational-conventions" title="Notational Conventions">
 
@@ -76,7 +76,7 @@
 
 <t>This specification uses the Augmented Backus-Naur Form (ABNF) notation of <xref target="RFC5234"/> and includes, by reference, the IMF-fixdate rule as defined in Section 7.1.1.1 of <xref target="RFC7231"/>.</t>
 
-<t>The term “resource” is to be interpreted as defined in Section 2 of <xref target="RFC7231"/>, that is identified by an URI.</t>
+<t>The term “resource” is to be interpreted as defined in Section 2 of <xref target="RFC7231"/>, that is identified by an URI. The term “resource server” is to be interpreted as “origin server” as defined in Section 3 of <xref target="RFC7231"/>.</t>
 
 </section>
 </section>
@@ -99,7 +99,7 @@ idempotencyvalue      = %x21 / %x23-7E / obs-text
 
 <t>Clients MUST NOT include more than one <spanx style="verb">Idempotency-Key</spanx> header field in the same request.</t>
 
-<t>The following example shows an idempotency key using UUID version 4 scheme:</t>
+<t>The following example shows an idempotency key using <spanx style="verb">UUID</spanx> <xref target="RFC4122"/>:</t>
 
 <figure><artwork><![CDATA[
 Idempotency-Key: "8e03978e-40d5-43e8-bc93-6894a57f9324"
@@ -108,39 +108,26 @@ Idempotency-Key: "8e03978e-40d5-43e8-bc93-6894a57f9324"
 </section>
 <section anchor="uniqueness-of-idempotency-key" title="Uniqueness of Idempotency Key">
 
-<t>The idempotency key that is supplied as part of every <spanx style="verb">POST</spanx> request MUST be unique and can not be reused with another request with a different request payload.</t>
+<t>The idempotency key that is supplied as part of every <spanx style="verb">POST</spanx> request MUST be unique and <spanx style="verb">MUST</spanx> not be reused with another request with a different request payload.</t>
 
-<t>How to make the key unique is up to the client and it’s agreed protocol with the resource owner. It is <spanx style="verb">RECOMMENDED</spanx> that <spanx style="verb">UUID</spanx> or a similar random identifier be used as the idempotency key.</t>
+<t>Uniqueness of the key <spanx style="verb">MUST</spanx> be defined by the resource owner and <spanx style="verb">MUST</spanx> be implemented by the clients of the resource server. It is <spanx style="verb">RECOMMENDED</spanx> that <spanx style="verb">UUID</spanx> <xref target="RFC4122"/> or a similar random identifier be used as an idempotency key.</t>
 
 </section>
 <section anchor="idempotency-key-validity-and-expiry" title="Idempotency Key Validity and Expiry">
 
-<t>The resource MAY enforce a time based idempotency keys, thus, be able to purge or delete a key upon its expiry. The resource server SHOULD publish expiration policy related documentation.</t>
+<t>The resource MAY enforce time based idempotency keys, thus, be able to purge or delete a key upon its expiry. The resource server SHOULD define such expiration policy and publish in related documentation.</t>
 
 </section>
 <section anchor="idempotency-fingerprint" title="Idempotency Fingerprint">
 
-<t>An idempotency fingerprint MAY be used in conjunction with with an idempotency key to determine the uniqueness of a request and is generated from request payload data. An idempotency fingerprint is generated by the resource implementation. Idempotency Fingerprint generation algorithm MAY use one of the following or similar approaches to generate a fingerprint.</t>
+<t>An idempotency fingerprint MAY be used in conjunction with an idempotency key to determine the uniqueness of a request. Such a fingerprint is generated from request payload data by the resource server. An idempotency fingerprint generation algorithm MAY use one of the following or similar approaches to create a fingerprint.</t>
 
 <t><list style="symbols">
   <t>Checksum of the entire request payload.</t>
-  <t>Checksum of selected elements in the request payload.</t>
+  <t>Checksum of selected element(s) in the request payload.</t>
   <t>Field value match for each field in the request payload.</t>
-  <t>Field value match for selected elements in the request payload.</t>
+  <t>Field value match for selected element(s) in the request payload.</t>
   <t>Request digest/signature.</t>
-</list></t>
-
-</section>
-<section anchor="idempotency-enforcement-scenarios" title="Idempotency Enforcement Scenarios">
-
-<t><list style="symbols">
-  <t>First time request (Idempotency Key and Idempotency Fingerprint scenarios has not been seen)  <vspace blankLines='1'/>
-The resource server SHOULD process the request normally and respond with an appropriate response and status code.</t>
-  <t>Duplicate request (Idempotency Key and Idempotency Fingerprint scenarios has been seen)  <vspace blankLines='1'/>
-Replay  <vspace blankLines='1'/>
-The request was replayed after the original request completed. The resource server MUST respond with the result of the previously completed operation, success or an error.  <vspace blankLines='1'/>
-Concurrent Request  <vspace blankLines='1'/>
-The request was replayed before the original request completed. The resource server MUST respond with a resource conflict error. See ## Error Scenarios for details.</t>
 </list></t>
 
 </section>
@@ -148,21 +135,43 @@ The request was replayed before the original request completed. The resource ser
 
 <t>Client</t>
 
-<t>For the idempotent resource operations, the client MUST present a unique idempotency key in Idempotency-Key request header field.</t>
+<t>Clients of <spanx style="verb">HTTP API</spanx> requiring idempotency, SHOULD understand the idempotency related requirements as published by the server and use appropriate algorithm to generate idempotency keys.</t>
+
+<t>For each request, client SHOULD</t>
+
+<t><list style="symbols">
+  <t>Send a unique idempotency key in the HTTP <spanx style="verb">Idempotency-Key</spanx> request header field.</t>
+</list></t>
 
 <t>Resource Server</t>
 
+<t>Resource server MUST publish idempotency related specification. This specification MUST include expiration related policy if applicable. Server is responsible for managing the lifecycle of the idempotency key.</t>
+
+<t>For each request, server SHOULD</t>
+
 <t><list style="symbols">
-  <t>Generate Idempotency Fingerprint when required.</t>
-  <t>Check for idempotency under various scenarios including the ones described earlier.</t>
-  <t>Manage the lifecycle of the Idempotency Key.</t>
-  <t>Publish idempotency related specification in relevant documentation.</t>
+  <t>Identify idempotency key from the HTTP <spanx style="verb">Idempotency-Key</spanx> request header field.</t>
+  <t>Generate idempotency fingerprint if required.</t>
+  <t>Check for idempotency considering various scenarios including the ones described in section below.</t>
+</list></t>
+
+</section>
+<section anchor="idempotency-enforcement-scenarios" title="Idempotency Enforcement Scenarios">
+
+<t><list style="symbols">
+  <t>First time request (idempotency key or fingerprint has not been seen)  <vspace blankLines='1'/>
+The resource server SHOULD process the request normally and respond with an appropriate response and status code.</t>
+  <t>Duplicate request (idempotency key or fingerprint has been seen)  <vspace blankLines='1'/>
+Retry  <vspace blankLines='1'/>
+The request was retried after the original request completed. The resource server MUST respond with the result of the previously completed operation, success or an error.  <vspace blankLines='1'/>
+Concurrent Request  <vspace blankLines='1'/>
+The request was retried before the original request completed. The resource server MUST respond with a resource conflict error. See Error Scenarios for details.</t>
 </list></t>
 
 </section>
 <section anchor="error-scenarios" title="Error Scenarios">
 
-<t>If the <spanx style="verb">Idempotency-Key</spanx> request header is missing for a documented idempotent operation requiring this header, the resource server MUST reply with an <spanx style="verb">HTTP</spanx> <spanx style="verb">400</spanx> status code with body containing a link pointing to the relevant documentation. Alternately, using the <spanx style="verb">HTTP</spanx> header <spanx style="verb">Link</spanx>, client could be informed about the error too as shown below.</t>
+<t>If the <spanx style="verb">Idempotency-Key</spanx> request header is missing for a documented idempotent operation requiring this header, the resource server MUST reply with an <spanx style="verb">HTTP</spanx> <spanx style="verb">400</spanx> status code with body containing a link pointing to relevant documentation. Alternately, using the <spanx style="verb">HTTP</spanx> header <spanx style="verb">Link</spanx>, the client can be informed about the error as shown below.</t>
 
 <figure><artwork><![CDATA[
 HTTP/1.1 400 Bad Request
@@ -170,7 +179,7 @@ Link: <https://developer.example.com/idempotency>;
   rel="describedby"; type="text/html"
 ]]></artwork></figure>
 
-<t>If there is an attempt to reuse an idempotency key with a different request payload, the resource server MUST reply with an <spanx style="verb">HTTP</spanx> <spanx style="verb">422</spanx> status code with body containing a link pointing to the relevant documentation. Using the <spanx style="verb">HTTP</spanx> header <spanx style="verb">Link</spanx>, client could be informed about the error as following.</t>
+<t>If there is an attempt to reuse an idempotency key with a different request payload, the resource server MUST reply with a <spanx style="verb">HTTP</spanx> <spanx style="verb">422</spanx> status code with body containing a link pointing to relevant documentation. The status code <spanx style="verb">422</spanx> is defined in Section 11.2 of <xref target="RFC4918"/>. The server can also inform the client using <spanx style="verb">HTTP</spanx> header <spanx style="verb">Link</spanx> as shown below.</t>
 
 <figure><artwork><![CDATA[
 HTTP/1.1 422 Unprocessable Entity
@@ -178,7 +187,7 @@ Link: <https://developer.example.com/idempotency>;
 rel="describedby"; type="text/html"
 ]]></artwork></figure>
 
-<t>If there is an attempt to reuse an idempotency key that is expired, the resource server MUST reply with an <spanx style="verb">HTTP</spanx> <spanx style="verb">422</spanx> status code with body containing a link pointing to the relevant documentation. Using the <spanx style="verb">HTTP</spanx> header <spanx style="verb">Link</spanx>, client could be informed about the error as following.</t>
+<t>If there is an attempt to reuse an idempotency key that has expired, the resource server MUST reply with an <spanx style="verb">HTTP</spanx> <spanx style="verb">422</spanx> status code with body containing a link pointing to the relevant documentation. Using the <spanx style="verb">HTTP</spanx> header <spanx style="verb">Link</spanx>, client can be informed about the error as shown below.</t>
 
 <figure><artwork><![CDATA[
 HTTP/1.1 422 Unprocessable Entity
@@ -186,7 +195,7 @@ Link: <https://developer.example.com/idempotency>;
 rel="describedby"; type="text/html"
 ]]></artwork></figure>
 
-<t>If the request is replayed, while the original request is still processing, the resource server MUST reply with an <spanx style="verb">HTTP</spanx> <spanx style="verb">409</spanx> status code with body containing a link pointing to the relevant documentation. Using the <spanx style="verb">HTTP</spanx> header <spanx style="verb">Link</spanx>, client could be informed about the error as following.</t>
+<t>If the request is replayed, while the original request is still processing, the resource server MUST reply with an <spanx style="verb">HTTP</spanx> <spanx style="verb">409</spanx> status code with body containing a link pointing to the relevant documentation. Using the <spanx style="verb">HTTP</spanx> header <spanx style="verb">Link</spanx>, client can be informed as well.</t>
 
 <figure><artwork><![CDATA[
 HTTP/1.1 409 Conflict
@@ -352,7 +361,7 @@ other implementations may exist.</t>
 <t>This section is meant to inform developers, information providers,
 and users of known security concerns specific to the idempotency keys.</t>
 
-<t>For idempotent request handling, the resources MAY make use of the value in the idempotency key to look up the idempotent request cache such as a persistent store, for duplicate requests, matching the key. If the resource does not validate the value of the idempotency key, prior to performing the lookup, it MAY lead to various forms of security attacks, compromising itself. To avoid such situations, the resource SHOULD publish the expected format of the idempotency key  and always validate the value as per the published specification for the key, before processing the request.</t>
+<t>For idempotent request handling, the resources MAY make use of the value in the idempotency key to look up a cache or a persistent store for duplicate requests matching the key. If the resource does not validate the value of the idempotency key prior to performing such a lookup, it MAY lead to various forms of security attacks and compromise. To avoid such situations, the resource SHOULD publish the expected format of the idempotency key, algorithm used to generate it and always validate the key value as per the published specification before processing any request.</t>
 
 </section>
 <section anchor="examples" title="Examples">
@@ -439,6 +448,34 @@ Idempotency-Key: "clkyoesmbgybucifusbbtdsbohtyuuwz"
 
 
 
+<reference  anchor="RFC4122" target='https://www.rfc-editor.org/info/rfc4122'>
+<front>
+<title>A Universally Unique IDentifier (UUID) URN Namespace</title>
+<author initials='P.' surname='Leach' fullname='P. Leach'><organization /></author>
+<author initials='M.' surname='Mealling' fullname='M. Mealling'><organization /></author>
+<author initials='R.' surname='Salz' fullname='R. Salz'><organization /></author>
+<date year='2005' month='July' />
+<abstract><t>This specification defines a Uniform Resource Name namespace for UUIDs (Universally Unique IDentifier), also known as GUIDs (Globally Unique IDentifier).  A UUID is 128 bits long, and can guarantee uniqueness across space and time.  UUIDs were originally used in the Apollo Network Computing System and later in the Open Software Foundation\'s (OSF) Distributed Computing Environment (DCE), and then in Microsoft Windows platforms.</t><t>This specification is derived from the DCE specification with the kind permission of the OSF (now known as The Open Group).  Information from earlier versions of the DCE specification have been incorporated into this document.  [STANDARDS-TRACK]</t></abstract>
+</front>
+<seriesInfo name='RFC' value='4122'/>
+<seriesInfo name='DOI' value='10.17487/RFC4122'/>
+</reference>
+
+
+
+<reference  anchor="RFC4918" target='https://www.rfc-editor.org/info/rfc4918'>
+<front>
+<title>HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)</title>
+<author initials='L.' surname='Dusseault' fullname='L. Dusseault' role='editor'><organization /></author>
+<date year='2007' month='June' />
+<abstract><t>Web Distributed Authoring and Versioning (WebDAV) consists of a set of methods, headers, and content-types ancillary to HTTP/1.1 for the management of resource properties, creation and management of resource collections, URL namespace manipulation, and resource locking (collision avoidance).</t><t>RFC 2518 was published in February 1999, and this specification obsoletes RFC 2518 with minor revisions mostly due to interoperability experience.  [STANDARDS-TRACK]</t></abstract>
+</front>
+<seriesInfo name='RFC' value='4918'/>
+<seriesInfo name='DOI' value='10.17487/RFC4918'/>
+</reference>
+
+
+
 <reference  anchor="RFC3864" target='https://www.rfc-editor.org/info/rfc3864'>
 <front>
 <title>Registration Procedures for Message Header Fields</title>
@@ -508,7 +545,7 @@ Idempotency-Key: "clkyoesmbgybucifusbbtdsbohtyuuwz"
 
 <section anchor="appendix-a-imported-abnf" title="Appendix A.  Imported ABNF">
 
-<t>The following core rules are included by reference, as defined in Appendix B.1 of <xref target="RFC5234"></xref>: ALPHA (letters), CR (carriage return), CRLF (CR LF), CTL (controls), DIGIT (decimal 0-9), DQUOTE (double quote), HEXDIG (hexadecimal 0-9/A-F/a-f), LF (line feed), OCTET (any 8-bit sequence of data), SP (space), and VCHAR (any visible US-ASCII character).</t>
+<t>The following core rules are included by reference, as defined in Appendix B.1 of <xref target="RFC5234"/>: ALPHA (letters), CR (carriage return), CRLF (CR LF), CTL (controls), DIGIT (decimal 0-9), DQUOTE (double quote), HEXDIG (hexadecimal 0-9/A-F/a-f), LF (line feed), OCTET (any 8-bit sequence of data), SP (space), and VCHAR (any visible US-ASCII character).</t>
 
 <t>The rules below are defined in <xref target="RFC7230"/>:</t>
 
@@ -523,128 +560,130 @@ Idempotency-Key: "clkyoesmbgybucifusbbtdsbohtyuuwz"
   </back>
 
 <!-- ##markdown-source:
-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
-6z7I48Hh4Mu/9f4bxOSXaM07AAA=
+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
 
 -->
 

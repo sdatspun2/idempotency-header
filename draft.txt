@@ -3,9 +3,9 @@
 
 
 Network Working Group                                            J. Jena
-Internet-Draft                                                          
+Internet-Draft                                              PayPal, Inc.
 Intended status: Standards Track                                S. Dalal
-Expires: 22 May 2021                                    18 November 2020
+Expires: 26 May 2021                                    22 November 2020
 
 
                    The Idempotency HTTP Header Field
@@ -32,7 +32,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 May 2021.
+   This Internet-Draft will expire on 26 May 2021.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Jena & Dalal               Expires 22 May 2021                  [Page 1]
+Jena & Dalal               Expires 26 May 2021                  [Page 1]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -67,19 +67,19 @@ Table of Contents
      2.2.  Uniqueness of Idempotency Key . . . . . . . . . . . . . .   4
      2.3.  Idempotency Key Validity and Expiry . . . . . . . . . . .   4
      2.4.  Idempotency Fingerprint . . . . . . . . . . . . . . . . .   4
-     2.5.  Idempotency Enforcement Scenarios . . . . . . . . . . . .   4
-     2.6.  Responsibilities  . . . . . . . . . . . . . . . . . . . .   5
-     2.7.  Error Scenarios . . . . . . . . . . . . . . . . . . . . .   5
-   3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
-     3.1.  The Idempotency-Key HTTP Request Header Field . . . . . .   6
+     2.5.  Responsibilities  . . . . . . . . . . . . . . . . . . . .   4
+     2.6.  Idempotency Enforcement Scenarios . . . . . . . . . . . .   5
+     2.7.  Error Scenarios . . . . . . . . . . . . . . . . . . . . .   6
+   3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
+     3.1.  The Idempotency-Key HTTP Request Header Field . . . . . .   7
    4.  Implementation Status . . . . . . . . . . . . . . . . . . . .   7
-     4.1.  Implementing the Concept  . . . . . . . . . . . . . . . .   8
+     4.1.  Implementing the Concept  . . . . . . . . . . . . . . . .   9
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
-   6.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .  10
+   6.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .  11
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .  11
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .  11
-   Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .  11
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .  12
+   Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .  12
    Appendix B.  Appendix . . . . . . . . . . . . . . . . . . . . . .  12
      B.1.  Appendix A.  Imported ABNF  . . . . . . . . . . . . . . .  12
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  12
@@ -95,37 +95,36 @@ Table of Contents
    Idempotency is important in building a fault-tolerant "HTTP API".  An
    "HTTP" request method is considered "idempotent" if the intended
    effect on the server of multiple identical requests with that method
-   is the same as the effect for a single such request.  [RFC7231]
-   defines methods "OPTIONS", "HEAD", "GET", "PUT" and "DELETE" as
-   idempotent.  However, "POST" and "PATCH" methods are "NOT"
-   idempotent.
+   is the same as the effect for a single such request.  According to
+   [RFC7231], "HTTP" methods "OPTIONS", "HEAD", "GET", "PUT" and
+   "DELETE" are idempotent while methods "POST" and "PATCH" are not.
 
-   Suppose a client on "HTTP API" wants to create or update a resource
-   using "POST" method.  Since "POST" is "NOT" an idempotent method,
-   calling it multiple times can result in duplication or wrong updates.
-   What would happen if you sent out the POST request to the server, but
-   you get a timeout?  Is the resource actually created or updated?
-   Does the timeout happen during sending of the request to the server,
+   Let's say a client of an "HTTP API" wants to create (or update) a
+   resource using a "POST" method.  Since "POST" is "NOT" an idempotent
+   method, calling it multiple times can result in duplication or wrong
+   updates.  Consider a scenario where the client sent a "POST" request
+   to the server, but it got a timeout.  Following questions arise.  Is
+   the resource actually created (or updated)?  Did the timeout occur
+   during sending of the request, or when receiving of the response?
 
 
 
-Jena & Dalal               Expires 22 May 2021                  [Page 2]
+Jena & Dalal               Expires 26 May 2021                  [Page 2]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
-   or while receiving the response on the client?  Can we safely retry
-   again, or do we need to figure out first what has happened with the
-   resource?  If "POST" had been an idempotent method, we would not have
-   to answer such questions.  We could safely resend a request until we
-   actually get a response back from the server.
+   Can the client safely retry the request, or does it need to figure
+   out what happened in the first place?  If "POST" had been an
+   idempotent method, such questions may not arise.  Client would safely
+   retry a request until it actually gets a valid response from the
+   server.
 
-   For many use cases in "HTTP API", creation of duplicate records is a
-   severe problem from business perspective.  For example, in Fintech
-   industry, duplicate records for requests involving any kind of
-   payment transaction on a financial account "MUST NOT" be allowed.  In
-   other cases, processing of duplicate webhooks due to retries is not
-   warranted.
+   For many use cases of "HTTP API", duplicate resource is a severe
+   problem from business perspective.  For example, duplicate records
+   for requests involving any kind of money transfer "MUST NOT" be
+   allowed.  In other cases, processing of duplicate webhook delivery is
+   not expected.
 
 1.1.  Notational Conventions
 
@@ -140,7 +139,9 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    rule as defined in Section 7.1.1.1 of [RFC7231].
 
    The term "resource" is to be interpreted as defined in Section 2 of
-   [RFC7231], that is identified by an URI.
+   [RFC7231], that is identified by an URI.  The term "resource server"
+   is to be interpreted as "origin server" as defined in Section 3 of
+   [RFC7231].
 
 2.  The Idempotency HTTP Request Header Field
 
@@ -160,143 +161,156 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    idempotencyvalue      = %x21 / %x23-7E / obs-text
           ; VCHAR except double quotes, plus obs-text
 
-   Clients MUST NOT include more than one "Idempotency-Key" header field
-   in the same request.
 
 
 
-Jena & Dalal               Expires 22 May 2021                  [Page 3]
+
+Jena & Dalal               Expires 26 May 2021                  [Page 3]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
-   The following example shows an idempotency key using UUID version 4
-   scheme:
+   Clients MUST NOT include more than one "Idempotency-Key" header field
+   in the same request.
+
+   The following example shows an idempotency key using "UUID"
+   [RFC4122]:
 
    Idempotency-Key: "8e03978e-40d5-43e8-bc93-6894a57f9324"
 
 2.2.  Uniqueness of Idempotency Key
 
    The idempotency key that is supplied as part of every "POST" request
-   MUST be unique and can not be reused with another request with a
+   MUST be unique and "MUST" not be reused with another request with a
    different request payload.
 
-   How to make the key unique is up to the client and it's agreed
-   protocol with the resource owner.  It is "RECOMMENDED" that "UUID" or
-   a similar random identifier be used as the idempotency key.
+   Uniqueness of the key "MUST" be defined by the resource owner and
+   "MUST" be implemented by the clients of the resource server.  It is
+   "RECOMMENDED" that "UUID" [RFC4122] or a similar random identifier be
+   used as an idempotency key.
 
 2.3.  Idempotency Key Validity and Expiry
 
-   The resource MAY enforce a time based idempotency keys, thus, be able
+   The resource MAY enforce time based idempotency keys, thus, be able
    to purge or delete a key upon its expiry.  The resource server SHOULD
-   publish expiration policy related documentation.
+   define such expiration policy and publish in related documentation.
 
 2.4.  Idempotency Fingerprint
 
-   An idempotency fingerprint MAY be used in conjunction with with an
-   idempotency key to determine the uniqueness of a request and is
-   generated from request payload data.  An idempotency fingerprint is
-   generated by the resource implementation.  Idempotency Fingerprint
-   generation algorithm MAY use one of the following or similar
-   approaches to generate a fingerprint.
+   An idempotency fingerprint MAY be used in conjunction with an
+   idempotency key to determine the uniqueness of a request.  Such a
+   fingerprint is generated from request payload data by the resource
+   server.  An idempotency fingerprint generation algorithm MAY use one
+   of the following or similar approaches to create a fingerprint.
 
    *  Checksum of the entire request payload.
 
-   *  Checksum of selected elements in the request payload.
+   *  Checksum of selected element(s) in the request payload.
 
    *  Field value match for each field in the request payload.
 
-   *  Field value match for selected elements in the request payload.
+   *  Field value match for selected element(s) in the request payload.
 
    *  Request digest/signature.
 
-2.5.  Idempotency Enforcement Scenarios
+2.5.  Responsibilities
 
-   *  First time request (Idempotency Key and Idempotency Fingerprint
-      scenarios has not been seen)
-
-      The resource server SHOULD process the request normally and
-      respond with an appropriate response and status code.
+   Client
 
 
 
 
-Jena & Dalal               Expires 22 May 2021                  [Page 4]
+
+Jena & Dalal               Expires 26 May 2021                  [Page 4]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
-   *  Duplicate request (Idempotency Key and Idempotency Fingerprint
-      scenarios has been seen)
+   Clients of "HTTP API" requiring idempotency, SHOULD understand the
+   idempotency related requirements as published by the server and use
+   appropriate algorithm to generate idempotency keys.
 
-      Replay
+   For each request, client SHOULD
 
-      The request was replayed after the original request completed.
-      The resource server MUST respond with the result of the previously
+   *  Send a unique idempotency key in the HTTP "Idempotency-Key"
+      request header field.
+
+   Resource Server
+
+   Resource server MUST publish idempotency related specification.  This
+   specification MUST include expiration related policy if applicable.
+   Server is responsible for managing the lifecycle of the idempotency
+   key.
+
+   For each request, server SHOULD
+
+   *  Identify idempotency key from the HTTP "Idempotency-Key" request
+      header field.
+
+   *  Generate idempotency fingerprint if required.
+
+   *  Check for idempotency considering various scenarios including the
+      ones described in section below.
+
+2.6.  Idempotency Enforcement Scenarios
+
+   *  First time request (idempotency key or fingerprint has not been
+      seen)
+
+      The resource server SHOULD process the request normally and
+      respond with an appropriate response and status code.
+
+   *  Duplicate request (idempotency key or fingerprint has been seen)
+
+      Retry
+
+      The request was retried after the original request completed.  The
+      resource server MUST respond with the result of the previously
       completed operation, success or an error.
 
       Concurrent Request
 
-      The request was replayed before the original request completed.
+      The request was retried before the original request completed.
       The resource server MUST respond with a resource conflict error.
-      See ## Error Scenarios for details.
+      See Error Scenarios for details.
 
-2.6.  Responsibilities
 
-   Client
 
-   For the idempotent resource operations, the client MUST present a
-   unique idempotency key in Idempotency-Key request header field.
 
-   Resource Server
+Jena & Dalal               Expires 26 May 2021                  [Page 5]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
-   *  Generate Idempotency Fingerprint when required.
-
-   *  Check for idempotency under various scenarios including the ones
-      described earlier.
-
-   *  Manage the lifecycle of the Idempotency Key.
-
-   *  Publish idempotency related specification in relevant
-      documentation.
 
 2.7.  Error Scenarios
 
    If the "Idempotency-Key" request header is missing for a documented
    idempotent operation requiring this header, the resource server MUST
    reply with an "HTTP" "400" status code with body containing a link
-   pointing to the relevant documentation.  Alternately, using the
-   "HTTP" header "Link", client could be informed about the error too as
-   shown below.
+   pointing to relevant documentation.  Alternately, using the "HTTP"
+   header "Link", the client can be informed about the error as shown
+   below.
 
    HTTP/1.1 400 Bad Request
    Link: <https://developer.example.com/idempotency>;
      rel="describedby"; type="text/html"
 
-
-
-
-
-Jena & Dalal               Expires 22 May 2021                  [Page 5]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    If there is an attempt to reuse an idempotency key with a different
-   request payload, the resource server MUST reply with an "HTTP" "422"
-   status code with body containing a link pointing to the relevant
-   documentation.  Using the "HTTP" header "Link", client could be
-   informed about the error as following.
+   request payload, the resource server MUST reply with a "HTTP" "422"
+   status code with body containing a link pointing to relevant
+   documentation.  The status code "422" is defined in Section 11.2 of
+   [RFC4918].  The server can also inform the client using "HTTP" header
+   "Link" as shown below.
 
    HTTP/1.1 422 Unprocessable Entity
    Link: <https://developer.example.com/idempotency>;
    rel="describedby"; type="text/html"
 
-   If there is an attempt to reuse an idempotency key that is expired,
+   If there is an attempt to reuse an idempotency key that has expired,
    the resource server MUST reply with an "HTTP" "422" status code with
    body containing a link pointing to the relevant documentation.  Using
-   the "HTTP" header "Link", client could be informed about the error as
-   following.
+   the "HTTP" header "Link", client can be informed about the error as
+   shown below.
 
    HTTP/1.1 422 Unprocessable Entity
    Link: <https://developer.example.com/idempotency>;
@@ -305,8 +319,8 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    If the request is replayed, while the original request is still
    processing, the resource server MUST reply with an "HTTP" "409"
    status code with body containing a link pointing to the relevant
-   documentation.  Using the "HTTP" header "Link", client could be
-   informed about the error as following.
+   documentation.  Using the "HTTP" header "Link", client can be
+   informed as well.
 
    HTTP/1.1 409 Conflict
    Link: <https://developer.example.com/idempotency>;
@@ -315,6 +329,15 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    For other errors, the resource MUST return the appropriate status
    code and error message.
 
+
+
+
+
+Jena & Dalal               Expires 26 May 2021                  [Page 6]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
+
 3.  IANA Considerations
 
 3.1.  The Idempotency-Key HTTP Request Header Field
@@ -322,21 +345,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    The "Idempotency-Key" request header should be added to the permanent
    registry of message header fields (see [RFC3864]), taking into
    account the guidelines given by HTTP/1.1 [RFC7231].
-
-
-
-
-
-
-
-
-
-
-
-Jena & Dalal               Expires 22 May 2021                  [Page 6]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
 
    Header Field Name: Idempotency-Key
 
@@ -374,6 +382,18 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    features.  Readers are advised to note that other implementations may
    exist.
 
+
+
+
+
+
+
+
+Jena & Dalal               Expires 26 May 2021                  [Page 7]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
+
    According to RFC 7942, "this will allow reviewers and working groups
    to assign due consideration to documents that have the benefit of
    running code, which may serve as evidence of valuable experimentation
@@ -385,14 +405,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
    *  Description: Stripe uses custom HTTP header named "Idempotency-
       Key"
-
-
-
-
-Jena & Dalal               Expires 22 May 2021                  [Page 7]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
 
    *  Reference: https://stripe.com/docs/idempotency
 
@@ -429,6 +441,15 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    *  Description: Yandex uses custom HTTP header named "Idempotency-
       Key"
 
+
+
+
+
+Jena & Dalal               Expires 26 May 2021                  [Page 8]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
+
    *  Reference: https://cloud.yandex.com/docs/api-design-
       guide/concepts/idempotency
 
@@ -441,14 +462,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
    *  Description: Django uses custom HTTP header named
       "HTTP_IDEMPOTENCY_KEY"
-
-
-
-
-Jena & Dalal               Expires 22 May 2021                  [Page 8]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
 
    *  Reference: https://pypi.org/project/django-idempotency-key
 
@@ -486,6 +499,13 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
    Organization: Square
 
+
+
+Jena & Dalal               Expires 26 May 2021                  [Page 9]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
+
    *  Description: To make an idempotent API call, Square recommends
       adding a property named "idempotency_key" with a unique value in
       the request body.
@@ -498,13 +518,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    *  Description: Google Standard Payments API uses a property named
       "requestId" in request body in order to provider idempotency in
       various use cases.
-
-
-
-Jena & Dalal               Expires 22 May 2021                  [Page 9]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
 
    *  Reference: https://developers.google.com/standard-payments/
       payment-processor-service-api/rest/v1/TopLevel/capture
@@ -533,14 +546,21 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    keys.
 
    For idempotent request handling, the resources MAY make use of the
-   value in the idempotency key to look up the idempotent request cache
-   such as a persistent store, for duplicate requests, matching the key.
-   If the resource does not validate the value of the idempotency key,
-   prior to performing the lookup, it MAY lead to various forms of
-   security attacks, compromising itself.  To avoid such situations, the
-   resource SHOULD publish the expected format of the idempotency key
-   and always validate the value as per the published specification for
-   the key, before processing the request.
+   value in the idempotency key to look up a cache or a persistent store
+   for duplicate requests matching the key.  If the resource does not
+   validate the value of the idempotency key prior to performing such a
+   lookup, it MAY lead to various forms of security attacks and
+   compromise.  To avoid such situations, the resource SHOULD publish
+   the expected format of the idempotency key, algorithm used to
+   generate it and always validate the key value as per the published
+   specification before processing any request.
+
+
+
+Jena & Dalal               Expires 26 May 2021                 [Page 10]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
 6.  Examples
 
@@ -553,14 +573,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    using some random string generator:
 
    Idempotency-Key: "clkyoesmbgybucifusbbtdsbohtyuuwz"
-
-
-
-
-Jena & Dalal               Expires 22 May 2021                 [Page 10]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
 
 7.  References
 
@@ -576,6 +588,16 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
               DOI 10.17487/RFC3864, September 2004,
               <https://www.rfc-editor.org/info/rfc3864>.
 
+   [RFC4122]  Leach, P., Mealling, M., and R. Salz, "A Universally
+              Unique IDentifier (UUID) URN Namespace", RFC 4122,
+              DOI 10.17487/RFC4122, July 2005,
+              <https://www.rfc-editor.org/info/rfc4122>.
+
+   [RFC4918]  Dusseault, L., Ed., "HTTP Extensions for Web Distributed
+              Authoring and Versioning (WebDAV)", RFC 4918,
+              DOI 10.17487/RFC4918, June 2007,
+              <https://www.rfc-editor.org/info/rfc4918>.
+
    [RFC5234]  Crocker, D., Ed. and P. Overell, "Augmented BNF for Syntax
               Specifications: ABNF", STD 68, RFC 5234,
               DOI 10.17487/RFC5234, January 2008,
@@ -585,6 +607,16 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
               Protocol (HTTP/1.1): Message Syntax and Routing",
               RFC 7230, DOI 10.17487/RFC7230, June 2014,
               <https://www.rfc-editor.org/info/rfc7230>.
+
+
+
+
+
+
+Jena & Dalal               Expires 26 May 2021                 [Page 11]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
    [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
               Protocol (HTTP/1.1): Semantics and Content", RFC 7231,
@@ -610,14 +642,6 @@ Appendix A.  Acknowledgments
    documentation of PayPal (https://github.com/paypal/api-
    standards/blob/master/patterns.md#idempotency) and Stripe
    (https://stripe.com/docs/idempotency) as well as Internet Draft on
-
-
-
-Jena & Dalal               Expires 22 May 2021                 [Page 11]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    POST Once Exactly (https://tools.ietf.org/html/draft-nottingham-http-
    poe-00) authored by Mark Nottingham.
 
@@ -640,12 +664,25 @@ B.1.  Appendix A.  Imported ABNF
 
 Authors' Addresses
 
+
+
+
+
+
+Jena & Dalal               Expires 26 May 2021                 [Page 12]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
+
    Jayadeba Jena
+   PayPal, Inc.
+   United States of America
 
    Email: jjena@paypal.com
 
 
    Sanjay Dalal
+   United States of America
 
    Email: sanjay.dalal@cal.berkeley.edu
    URI:   https://github.com/sdatspun2
@@ -669,4 +706,23 @@ Authors' Addresses
 
 
 
-Jena & Dalal               Expires 22 May 2021                 [Page 12]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Jena & Dalal               Expires 26 May 2021                 [Page 13]
