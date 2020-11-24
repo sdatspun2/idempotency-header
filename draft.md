@@ -44,7 +44,7 @@ Idempotence is the property of certain operations in mathematics and computer sc
 
 Idempotency is important in building a fault-tolerant `HTTP API`. An `HTTP` request method is considered `idempotent` if the intended effect on the server of multiple identical requests with that method is the same as the effect for a single such request. According to {{!RFC7231}}, `HTTP` methods `OPTIONS`, `HEAD`, `GET`, `PUT` and `DELETE` are idempotent while methods `POST` and `PATCH` are not.
 
-Let's say a client of an `HTTP API` wants to create (or update) a resource using a `POST` method. Since `POST` is `NOT` an idempotent method, calling it multiple times can result in duplication or wrong updates. Consider a scenario where the client sent a `POST` request to the server, but it got a timeout. Following questions arise. Is the resource actually created (or updated)? Did the timeout occur during sending of the request, or when receiving of the response? Can the client safely retry the request, or does it need to figure out what happened in the first place? If `POST` had been an idempotent method, such questions may not arise. Client would safely retry a request until it actually gets a valid response from the server.
+Let's say a client of an `HTTP API` wants to create (or update) a resource using a `POST` method. Since `POST` is `NOT` an idempotent method, calling it multiple times can result in duplication or wrong updates. Consider a scenario where the client sent a `POST` request to the server, but it got a timeout. Following questions arise :  Is the resource actually created (or updated)? Did the timeout occur during sending of the request, or when receiving of the response? Can the client safely retry the request, or does it need to figure out what happened in the first place? If `POST` had been an idempotent method, such questions may not arise. Client would safely retry a request until it actually gets a valid response from the server.
 
 For many use cases of `HTTP API`, duplicate resource is a severe problem from business perspective. For example, duplicate records for requests involving any kind of money transfer `MUST NOT` be allowed. In other cases, processing of duplicate webhook delivery is not expected.  
 
@@ -152,20 +152,13 @@ If the `Idempotency-Key` request header is missing for a documented idempotent o
     Link: <https://developer.example.com/idempotency>;
       rel="describedby"; type="text/html"
 
-If there is an attempt to reuse an idempotency key with a different request payload, the resource server MUST reply with a `HTTP` `422` status code with body containing a link pointing to relevant documentation. The status code `422` is defined in Section 11.2 of {{!RFC4918}}. The server can also inform the client using `HTTP` header `Link` as shown below.
+If there is an attempt to reuse an idempotency key with a different request payload, the resource server MUST reply with a `HTTP` `422` status code with body containing a link pointing to relevant documentation. The status code `422` is defined in Section 11.2 of {{!RFC4918}}. The server can also inform the client by using the `HTTP` header `Link` as shown below.
 
     HTTP/1.1 422 Unprocessable Entity
     Link: <https://developer.example.com/idempotency>;
     rel="describedby"; type="text/html"
 
-If there is an attempt to reuse an idempotency key that has expired, the resource server MUST reply with an `HTTP` `422` status code with body containing a link pointing to the relevant documentation. Using the `HTTP` header `Link`, client can be informed about the error as shown below.
-
-    HTTP/1.1 422 Unprocessable Entity
-    Link: <https://developer.example.com/idempotency>;
-    rel="describedby"; type="text/html"
-
-
-If the request is replayed, while the original request is still processing, the resource server MUST reply with an `HTTP` `409` status code with body containing a link pointing to the relevant documentation. Using the `HTTP` header `Link`, client can be informed as well.
+If the request is retried, while the original request is still being processed, the resource server MUST reply with an `HTTP` `409` status code with body containing a link or the `HTTP` header `Link` pointing to the relevant documentation.
 
     HTTP/1.1 409 Conflict
     Link: <https://developer.example.com/idempotency>;

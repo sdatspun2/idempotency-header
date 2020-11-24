@@ -5,7 +5,7 @@
 Network Working Group                                            J. Jena
 Internet-Draft                                              PayPal, Inc.
 Intended status: Standards Track                                S. Dalal
-Expires: 26 May 2021                                    22 November 2020
+Expires: 27 May 2021                                    23 November 2020
 
 
                    The Idempotency HTTP Header Field
@@ -32,7 +32,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 May 2021.
+   This Internet-Draft will expire on 27 May 2021.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Jena & Dalal               Expires 26 May 2021                  [Page 1]
+Jena & Dalal               Expires 27 May 2021                  [Page 1]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -70,15 +70,15 @@ Table of Contents
      2.5.  Responsibilities  . . . . . . . . . . . . . . . . . . . .   4
      2.6.  Idempotency Enforcement Scenarios . . . . . . . . . . . .   5
      2.7.  Error Scenarios . . . . . . . . . . . . . . . . . . . . .   6
-   3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   7
-     3.1.  The Idempotency-Key HTTP Request Header Field . . . . . .   7
+   3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   6
+     3.1.  The Idempotency-Key HTTP Request Header Field . . . . . .   6
    4.  Implementation Status . . . . . . . . . . . . . . . . . . . .   7
-     4.1.  Implementing the Concept  . . . . . . . . . . . . . . . .   9
+     4.1.  Implementing the Concept  . . . . . . . . . . . . . . . .   8
    5.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
-   6.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .  11
+   6.  Examples  . . . . . . . . . . . . . . . . . . . . . . . . . .  10
    7.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  11
      7.1.  Normative References  . . . . . . . . . . . . . . . . . .  11
-     7.2.  Informative References  . . . . . . . . . . . . . . . . .  12
+     7.2.  Informative References  . . . . . . . . . . . . . . . . .  11
    Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .  12
    Appendix B.  Appendix . . . . . . . . . . . . . . . . . . . . . .  12
      B.1.  Appendix A.  Imported ABNF  . . . . . . . . . . . . . . .  12
@@ -103,13 +103,13 @@ Table of Contents
    resource using a "POST" method.  Since "POST" is "NOT" an idempotent
    method, calling it multiple times can result in duplication or wrong
    updates.  Consider a scenario where the client sent a "POST" request
-   to the server, but it got a timeout.  Following questions arise.  Is
+   to the server, but it got a timeout.  Following questions arise : Is
    the resource actually created (or updated)?  Did the timeout occur
    during sending of the request, or when receiving of the response?
 
 
 
-Jena & Dalal               Expires 26 May 2021                  [Page 2]
+Jena & Dalal               Expires 27 May 2021                  [Page 2]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -165,7 +165,7 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
 
-Jena & Dalal               Expires 26 May 2021                  [Page 3]
+Jena & Dalal               Expires 27 May 2021                  [Page 3]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -221,7 +221,7 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
 
-Jena & Dalal               Expires 26 May 2021                  [Page 4]
+Jena & Dalal               Expires 27 May 2021                  [Page 4]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -277,7 +277,7 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
 
-Jena & Dalal               Expires 26 May 2021                  [Page 5]
+Jena & Dalal               Expires 27 May 2021                  [Page 5]
 
 Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
@@ -299,28 +299,17 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    request payload, the resource server MUST reply with a "HTTP" "422"
    status code with body containing a link pointing to relevant
    documentation.  The status code "422" is defined in Section 11.2 of
-   [RFC4918].  The server can also inform the client using "HTTP" header
-   "Link" as shown below.
+   [RFC4918].  The server can also inform the client by using the "HTTP"
+   header "Link" as shown below.
 
    HTTP/1.1 422 Unprocessable Entity
    Link: <https://developer.example.com/idempotency>;
    rel="describedby"; type="text/html"
 
-   If there is an attempt to reuse an idempotency key that has expired,
-   the resource server MUST reply with an "HTTP" "422" status code with
-   body containing a link pointing to the relevant documentation.  Using
-   the "HTTP" header "Link", client can be informed about the error as
-   shown below.
-
-   HTTP/1.1 422 Unprocessable Entity
-   Link: <https://developer.example.com/idempotency>;
-   rel="describedby"; type="text/html"
-
-   If the request is replayed, while the original request is still
-   processing, the resource server MUST reply with an "HTTP" "409"
-   status code with body containing a link pointing to the relevant
-   documentation.  Using the "HTTP" header "Link", client can be
-   informed as well.
+   If the request is retried, while the original request is still being
+   processed, the resource server MUST reply with an "HTTP" "409" status
+   code with body containing a link or the "HTTP" header "Link" pointing
+   to the relevant documentation.
 
    HTTP/1.1 409 Conflict
    Link: <https://developer.example.com/idempotency>;
@@ -329,15 +318,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    For other errors, the resource MUST return the appropriate status
    code and error message.
 
-
-
-
-
-Jena & Dalal               Expires 26 May 2021                  [Page 6]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
 3.  IANA Considerations
 
 3.1.  The Idempotency-Key HTTP Request Header Field
@@ -345,6 +325,18 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    The "Idempotency-Key" request header should be added to the permanent
    registry of message header fields (see [RFC3864]), taking into
    account the guidelines given by HTTP/1.1 [RFC7231].
+
+
+
+
+
+
+
+
+Jena & Dalal               Expires 27 May 2021                  [Page 6]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
    Header Field Name: Idempotency-Key
 
@@ -382,18 +374,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    features.  Readers are advised to note that other implementations may
    exist.
 
-
-
-
-
-
-
-
-Jena & Dalal               Expires 26 May 2021                  [Page 7]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    According to RFC 7942, "this will allow reviewers and working groups
    to assign due consideration to documents that have the benefit of
    running code, which may serve as evidence of valuable experimentation
@@ -405,6 +385,14 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
    *  Description: Stripe uses custom HTTP header named "Idempotency-
       Key"
+
+
+
+
+Jena & Dalal               Expires 27 May 2021                  [Page 7]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
    *  Reference: https://stripe.com/docs/idempotency
 
@@ -441,15 +429,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    *  Description: Yandex uses custom HTTP header named "Idempotency-
       Key"
 
-
-
-
-
-Jena & Dalal               Expires 26 May 2021                  [Page 8]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    *  Reference: https://cloud.yandex.com/docs/api-design-
       guide/concepts/idempotency
 
@@ -462,6 +441,14 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
    *  Description: Django uses custom HTTP header named
       "HTTP_IDEMPOTENCY_KEY"
+
+
+
+
+Jena & Dalal               Expires 27 May 2021                  [Page 8]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
    *  Reference: https://pypi.org/project/django-idempotency-key
 
@@ -499,13 +486,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
    Organization: Square
 
-
-
-Jena & Dalal               Expires 26 May 2021                  [Page 9]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    *  Description: To make an idempotent API call, Square recommends
       adding a property named "idempotency_key" with a unique value in
       the request body.
@@ -518,6 +498,13 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    *  Description: Google Standard Payments API uses a property named
       "requestId" in request body in order to provider idempotency in
       various use cases.
+
+
+
+Jena & Dalal               Expires 27 May 2021                  [Page 9]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
    *  Reference: https://developers.google.com/standard-payments/
       payment-processor-service-api/rest/v1/TopLevel/capture
@@ -555,13 +542,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    generate it and always validate the key value as per the published
    specification before processing any request.
 
-
-
-Jena & Dalal               Expires 26 May 2021                 [Page 10]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
 6.  Examples
 
    The first example shows an idempotency-key header field with key
@@ -573,6 +553,14 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
    using some random string generator:
 
    Idempotency-Key: "clkyoesmbgybucifusbbtdsbohtyuuwz"
+
+
+
+
+Jena & Dalal               Expires 27 May 2021                 [Page 10]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
 7.  References
 
@@ -608,16 +596,6 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
               RFC 7230, DOI 10.17487/RFC7230, June 2014,
               <https://www.rfc-editor.org/info/rfc7230>.
 
-
-
-
-
-
-Jena & Dalal               Expires 26 May 2021                 [Page 11]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., "Hypertext Transfer
               Protocol (HTTP/1.1): Semantics and Content", RFC 7231,
               DOI 10.17487/RFC7231, June 2014,
@@ -628,6 +606,17 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
 7.2.  Informative References
+
+
+
+
+
+
+
+Jena & Dalal               Expires 27 May 2021                 [Page 11]
+
+Internet-Draft      The Idempotency HTTP Header Field      November 2020
+
 
    [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
               Code: The Implementation Status Section", BCP 205,
@@ -664,16 +653,6 @@ B.1.  Appendix A.  Imported ABNF
 
 Authors' Addresses
 
-
-
-
-
-
-Jena & Dalal               Expires 26 May 2021                 [Page 12]
-
-Internet-Draft      The Idempotency HTTP Header Field      November 2020
-
-
    Jayadeba Jena
    PayPal, Inc.
    United States of America
@@ -690,39 +669,4 @@ Internet-Draft      The Idempotency HTTP Header Field      November 2020
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Jena & Dalal               Expires 26 May 2021                 [Page 13]
+Jena & Dalal               Expires 27 May 2021                 [Page 12]
