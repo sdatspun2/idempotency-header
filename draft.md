@@ -2,7 +2,7 @@
 coding: utf-8
 
 title: The Idempotency HTTP Header Field
-docname: draft-idempotency-header-00
+docname: draft-idempotency-header-01
 category: std
 ipr: trust200902
 stand_alone: yes

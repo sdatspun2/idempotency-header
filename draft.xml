@@ -14,7 +14,7 @@
 <?rfc comments="yes"?>
 <?rfc inline="yes"?>
 
-<rfc ipr="trust200902" docName="draft-idempotency-header-00" category="std">
+<rfc ipr="trust200902" docName="draft-idempotency-header-01" category="std">
 
   <front>
     <title>The Idempotency HTTP Header Field</title>
@@ -552,10 +552,10 @@ Idempotency-Key: "clkyoesmbgybucifusbbtdsbohtyuuwz"
   </back>
 
 <!-- ##markdown-source:
-H4sIAGiivF8AA7U7a3PbNrbf9Stwnblz7Y4o2Y7bxO5mu4otN+o6sdd2uu10
+H4sIAK2jvF8AA7U7a3PbNrbf9Stwnblz7Y4o2Y7bxO5mu4otN+o6sdd2uu10
 OhVEQhJiiuASoGW1k/++5wHwIclxOs3NztYSCRyc9wtHURR1YpPobHYiSjeN
 XnY6TrtUnYjbuRKjRC1y41QWr8Sb29sr8UbJRBXiXKs06SQmzuQCliaFnLpI
-14ujOa2L9vc7sXRqZorVibAu6ei8OBGuKK073N8/3j/sWCez5DeZmgzgrJTt
+14ujOa2L9g86sXRqZorVibAu6ei8OBGuKK073N8/3j/sWCez5DeZmgzgrJTt
 5PpE/OJM3BXwH50lKnNdYU3hCjW18Gm18B9coWN4FZtFLv2HBSyGVzpLdaZ+
 7XRk6eamOOkIEcH/BbywJ+KHnvhBZZIeMPo/yBVgO5H1c1PMZKZ/l06b7ERc
 ydWVTLtilMU9eq0WUqcn4sMHWP+PXK5ymfbgeHoXmzJzSO77mw7+g7OF/1fj
@@ -675,7 +675,7 @@ YnBx9WYgdlOFQrJ7XXF6LXZpABojOl850dOLc7EL7y7O8dvtBSzi6wLcczb6
 fnQrdrFlvIBaaj86xoc8drzbHAeGx2+GP8FysTsHE29s6A+i876MprACT8IL
 HerxwffL09shQEe/Bj5D42+OcGyQm4SYyMOamyuxa3MZ4wnIbR5Ipj33mqeQ
 3t9Eg5vT0Qh/4Yc/nVTFnpckM5TuXomtDeZVF0j71UxwNcscZqT/Fh50qRn4
-i9/wa7ceqe8d9r75e+e/RA7QXMs7AAA=
+i9/wa7ceqe8d9r75e+e//qKmsMs7AAA=
 
 -->
 

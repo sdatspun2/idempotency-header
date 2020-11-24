@@ -9,7 +9,7 @@ Expires: 27 May 2021                                    23 November 2020
 
 
                    The Idempotency HTTP Header Field
-                      draft-idempotency-header-00
+                      draft-idempotency-header-01
 
 Abstract
 
